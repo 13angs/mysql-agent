@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  # setup nginx for reverse proxying
+  mysql-agent:
+    image: mariadb:10.8.3-jammy
+    restart: always
+    
+    container_name: mysql-agent
+    environment: 
+      MARIADB_ROOT_PASSWORD: P@ssw0rd
+      TZ: Asia/Bangkok
+    volumes:
+      - type: volume
+        source: mysql-agent-data
+        target: /var/lib/mysql
+    networks:
+      - mysql-agent-network
+  
+  mysql-agent-pma:
+    image: phpmyadmin:latest
+    container_name: mysql-agent-pma
+    restart: always
+    networks:
+      - mysql-agent-network
+
+    ports:
+      - "8080:80"
+    environment:
+      - PMA_ARBITRARY=1
+      - UPLOAD_LIMIT=256M
+
+volumes:
+  mysql-agent-data:
+    name: mysql-agent-data
+
+networks: 
+  mysql-agent-network:
+    name: mysql-agent-network
